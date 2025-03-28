@@ -1,0 +1,96 @@
+<center>
+<h1>TASK MANAGER📝</h1>
+<input placeholder ="Add your task" id="taskIP">
+<Button onclick="sendData()"class="add">add</Button>
+<button onclick="viewAll()" class="view">list</button>
+<ul id="taskList"></ul>
+<link rel="stylesheet" href="style.css">
+
+</center>
+<script>
+   
+    function sendData(){
+        const task=document.getElementById("taskIP").value;
+        fetch("http://localhost:3000/addData",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({task})
+        })
+            .then(response=>response.json())
+            .then(data=>alert("Response:"+JSON.stringify(data)))
+            .catch(error => console.error("Error:",error));
+            viewAll();
+        }
+        function viewAll(){
+            fetch("http://localhost:3000/getAll",{
+                method:"GET",
+                headers:{"Content-Type":"application/json"},
+            })
+               .then(response=>response.json())
+               .then(data=>{
+                let taskList=document.getElementById("taskList");
+                taskList.innerHTML="";
+                data.forEach(task=>{
+                    let li=document.createElement("li")
+                    li.textContent=`${task.task} - ${task.status}`;
+
+                   let completeBtn=document.createElement("button");
+                   completeBtn.className="completeBtn";
+                    completeBtn.textContent="Complete";
+                   completeBtn.onclick=()=>updateData(task.id);
+                   
+              
+
+                   let delBtn=document.createElement("button");
+                   delBtn.textContent="delete";
+                   delBtn.onclick=()=>deleteData(task.id);
+                   delBtn.className="delBtn";
+                   li.append(completeBtn);
+                   li.append(delBtn);
+
+
+
+                    taskList.appendChild(li);
+                }
+
+                )
+                function updateData(id){
+                    fetch("http://localhost:3000/updateData",{
+                        method:"PUT",headers:{"Content-Type":"application/json"},
+                        body:JSON.stringify({id})
+
+                    })
+                    .then(response=>response.json())
+                    .then(data=>{
+                        alert(data.status);
+                        viewAll();
+                    })
+                    .catch(error=>console.error("Error:",error))
+                }
+                function deleteData(id){
+                    fetch("http://localhost:3000/deleteData",{
+                        method:"DELETE",headers:{"Content-Type":"application/json"},
+                        body:JSON.stringify({id})
+                    })
+                    .then(response=>response.json())
+                    .then(data=>{
+
+                        alert(data.status);
+                        viewAll();
+                    })
+                    .catch(erro=>console.error("Error:",error))
+                
+                }
+
+               })
+               .catch(error=>console.log("error:",error));
+               }
+
+            
+          
+
+</script>
+<center>
+<p><b>by</b></p>
+<p ><b>Rajagopalan A</b></p>
+</center>
